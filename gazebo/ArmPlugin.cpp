@@ -266,16 +266,27 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 		/
 		*/
 		bool collisionCheck = false;
-				
 		if (strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0)
 		{
 			collisionCheck = true;
 		}
-		
+
+
 		if (collisionCheck)
 		{
-			rewardHistory = REWARD_WIN * 5; // JDF obj1
+            // Reward if the gripper touches cylinder
+			if (strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0) {
+                // rewardHistory = REWARD_WIN * 5;
+                // rewardHistory = REWARD_WIN * 10;
+				rewardHistory = REWARD_WIN * 20;
+			// Loss multipler 
+            } else { 
+                // rewardHistory = REWARD_LOSS;
+                // rewardHistory = REWARD_LOSS * 2;
+                rewardHistory = REWARD_LOSS * 5;
+            }
 
+			// rewardHistory = REWARD_WIN * 5;
 			newReward  = true;
 			endEpisode = true;
 
@@ -599,6 +610,7 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 			gripBBox.min.z, gripBBox.max.z
 			);
 		}
+		if (gripBBox.min.z < groundContact) checkGroundContact = true;
 		
 		if(checkGroundContact)
 		{
